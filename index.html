@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,5 +8,31 @@
 		<script defer src="./js/script.js"></script>
 	</head>
 	<body>
+		<header class="app-header">
+			<h1>Expense & Budget Visualizer</h1>
+			<button id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+		</header>
+		<main class="app-main">
+			<section id="balance-section">
+				<h2>Total Balance</h2>
+				<p id="balance-display">Rp0</p>
+			</section>
+			<section id="form-section">
+				<h2>Add Transaction</h2>
+				<form id="transaction-form" novalidate>
+					<label for="item-name">Item Name</label>
+					<input id="item-name" type="text" maxlength=100>
+					<p id="item-name-error" class="field-error"></p>
+					<label for="amount">Amount (Rp)</label>
+					<input id="amount" type="number" min=0.01 max=9999999999.99 step=0.01>
+					<p id="amount-error" class="field-error"></p>
+					<label for="category">Category</label>
+					<select id="category"></select>
+					<p id="category-error" class="field-error"></p>
+					<button type="submit">Add Transaction</button>
+				</form>
+				<p id="form-error" class="error-message" role="alert"></p>
+			</section>
+		</main>
 	</body>
 </html>
