@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Expense & budget visualizer</title>
 		<link rel="stylesheet" href="./css/style.css">
+		<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 		<script defer src="./js/script.js"></script>
 	</head>
 	<body>
@@ -42,7 +43,14 @@
 			</section>
 			<section id="sort-section">
 				<label for="sort-select">Sort by</label>
-				<select id="sort-select"></select>
+				<select id="sort-select">
+					<option>newest</option>
+					<option>oldest</option>
+					<option>highest</option>
+					<option>lowest</option>
+					<option>category-asc</option>
+					<option>category-desc</option>
+				</select>
 			</section>
 			<section id="list-section">
 				<h2>Transanctions</h2>
