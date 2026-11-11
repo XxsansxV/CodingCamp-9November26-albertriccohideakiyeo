@@ -22,10 +22,10 @@
 				<h2>Add Transaction</h2>
 				<form id="transaction-form" novalidate>
 					<label for="item-name">Item Name</label>
-					<input id="item-name" type="text" maxlength=100>
+					<input id="item-name" type="text" maxlength="100">
 					<p id="item-name-error" class="field-error"></p>
 					<label for="amount">Amount (Rp)</label>
-					<input id="amount" type="number" min=0.01 max=9999999999.99 step=0.01>
+					<input id="amount" type="number" min="0.01" max="9999999999.99" step="0.01">
 					<p id="amount-error" class="field-error"></p>
 					<label for="category">Category</label>
 					<select id="category"></select>
@@ -39,21 +39,21 @@
 				<div class="chart-wrapper">
 					<canvas id="pie-chart"></canvas>
 				</div>
-				<p id="chart-empty"></p>
+				<p id="chart-empty" class="chart-empty hidden">No data available</p>
 			</section>
 			<section id="sort-section">
 				<label for="sort-select">Sort by</label>
 				<select id="sort-select">
-					<option>newest</option>
-					<option>oldest</option>
-					<option>highest</option>
-					<option>lowest</option>
-					<option>category-asc</option>
-					<option>category-desc</option>
+					<option value="newest">Newest First</option>
+					<option value="oldest">Oldest First</option>
+					<option value="highest">Highest Amount</option>
+					<option value="lowest">Lowest Amount</option>
+					<option value="category-asc">By Category (A-Z)</option>
+					<option value="category-desc">By Category (Z-A)</option>
 				</select>
 			</section>
 			<section id="list-section">
-				<h2>Transanctions</h2>
+				<h2>Transactions</h2>
 				<ul id="transaction-list" class="scrollable"></ul>
 				<p id="list-empty" class="empty-state hidden">No transactions yet</p>
 			</section>
