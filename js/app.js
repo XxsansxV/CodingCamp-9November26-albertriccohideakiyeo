@@ -21,6 +21,8 @@ const STORAGE_KEYS = {
 
 // =-=-=-=-=-=-= [ 2 | STATE ] =-=-=-=-=-=-=-=
 
+const observers = []
+
 const state = {
   transactions: [],
   customCategories: [],
@@ -73,4 +75,43 @@ const formatTimestamp = (date) => {
   const zeroPad = (num, places) => String(num).padStart(places, '0');
   
   return `${date.getFullYear()}-${zeroPad(date.getMonth()+1, 2)}-${zeroPad(date.getDate(), 2)}T${zeroPad(date.getHours(), 2)}:${zeroPad(date.getMinutes(), 2)}:${zeroPad(date.getSeconds(), 2)}`;
+}
+
+// =-=-=-=-=-=-= [ 4 | STORAGE ] =-=-=-=-=-=-=-=
+
+const saveToStorage = (key, data) => {
+  try {
+    localStorage.setItem(key, data);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+const loadFromStorage = (key) => {
+  try {    
+    return localStorage.getItem(key);
+  } catch (err) {
+    return null;
+  }
+}
+
+const isStorageAvailable = () => {
+  try {
+    saveToStorage('test', true);
+    localStorage.removeItem('test');
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+const subscribe = (callback) => {
+  observers.push(callback);
+}
+
+const notify = () => {
+  //TODO
 }
