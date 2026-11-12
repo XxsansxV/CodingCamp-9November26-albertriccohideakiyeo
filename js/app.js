@@ -102,6 +102,7 @@ const loadFromStorage = (key, fallback = null) => {
     }
     return JSON.parse(unprocessed);
   } catch (err) {
+    showStorageError('Saved data could not be read and was ignored.')
     return fallback;
   }
 }
@@ -126,6 +127,9 @@ const notify = () => {
 }
 
 const hydrate = () => {
+  if (!isStorageAvailable()) {
+    showStorageError('Local storage unavailable, changes will not be saved.');
+  }
   const transactions = loadFromStorage(STORAGE_KEYS.transactions, []);
   const categories = loadFromStorage(STORAGE_KEYS.categories, []);
   const limits = loadFromStorage(STORAGE_KEYS.limits, {});
@@ -165,6 +169,11 @@ const addTransaction = (itemName, amount, category) => {
     timestamp: formatTimestamp(new Date()),
   }
   state.transactions.push(transaction);
+  if (!persist()) {
+    state.transactions.pop();
+    showStorageError('Could not save the transaction. Storage unavailable.');
+    throw new Error('Could not save the transaction. Storage unavailable.');
+  }
   persist();
   notify();
   return transaction;
@@ -173,8 +182,15 @@ const addTransaction = (itemName, amount, category) => {
 const deleteTransaction = (id) => {
   const index = state.transactions.findIndex((item) => item.id === id);
   if (index === -1) return false;
-  state.transactions.splice(index, 1);
-  persist();
+
+  const [removed] = state.transactions.splice(index, 1);
+
+  if (!persist()) {
+    state.transactions.splice(index, 0, removed);
+    showStorageError('Could not delete the transaction. Storage is unavailable.');
+    throw new Error('Could not delete the transaction. Storage is unavailable.');
+  }
+
   notify();
   return true;
 }
@@ -207,6 +223,12 @@ const renderCategoryOptions = () => {
 
 const showFieldError = (id, msg) => {
   document.querySelector(`#${id}`).textContent = msg;
+}
+
+const showStorageError = (message) => {
+  const el = document.querySelector('#storage-error');
+  el.textContent = message;
+  el.classList.remove('hidden');
 }
 
 const clearFormErrors = () => {
@@ -252,7 +274,11 @@ const wireEvents = () => {
   document.querySelector('#transaction-list').addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-id]');
     if (!btn) return;
-    deleteTransaction(btn.dataset.id);
+    try {
+      deleteTransaction(btn.dataset.id);
+    } catch (err) {
+      
+    }
   })
   document.querySelector('#theme-toggle').addEventListener('click', () => {
     toggleTheme();
@@ -672,10 +698,11 @@ const getMonthlySummary = () => {
 
   const total = current.reduce((sum, t) => sum + t.amount, 0);
   const prevTotal = previous.reduce((sum, t) => sum + t.amount, 0);
-  const daysInMonth = new Date(now.getFullYear, now.getMonth() + 1, 0).getDate();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 
   return {
     monthLabel : now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+    total,
     breakdown: calculateCategoryTotals(current),
     hasPrevious: previous.length > 0,
     diff: total - prevTotal,
@@ -726,7 +753,7 @@ const renderMonthlySummary = () => {
   const comparison = document.createElement('p');
   comparison.className = 'summary-comparison';
 
-  if (!hasPrevious) {
+  if (!s.hasPrevious) {
     comparison.textContent = 'No previous month data';
     comparison.classList.add('neutral');
   } else if (s.diff === 0) {
@@ -740,7 +767,7 @@ const renderMonthlySummary = () => {
 
   const average = document.createElement('p');
   average.className = 'summary-average';
-  average.textContent = `Daily average: ${formatCurrency(s.dailyAverage)} (over ${daysInMonth} days)`;
+  average.textContent = `Daily average: ${formatCurrency(s.dailyAverage)} (over ${s.daysInMonth} days)`;
 
   container.append(heading, totalRow, list, comparison, average);
 }
