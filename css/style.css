@@ -1,451 +1,699 @@
-:root {
-  color-scheme: light;
-  --bg: #f5f6f8;
-  --surface: #ffffff;
-  --text: #1c1f24;
-  --text-muted: #667085;
-  --border: #e2e5ea;
-  --accent: #2563eb;
-  --danger: #dc2626;
-  --radius: 10px;
-  --shadow: 0 1px 3px rgb(0 0 0 / .08);
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 16px;
-  --space-4: 24px;
-}
-
-[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #12151b;
-  --surface: #1b1f27;
-  --text: #e8eaee;
-  --text-muted: #9aa3b2;
-  --border: #2a303b;
-  --accent: #60a5fa;
-  --danger: #f87171;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0 auto;
-  min-height: 100vh;
-  padding: var(--space-3);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  line-height: 1.5;
-  background: var(--bg);
-  color: var(--text);
-  max-width: 720px;
-}
-
-h1,
-h2,
-p,
-ul {
-  margin: 0;
-}
-
-h1 {
-  font-size: clamp(1.25rem, 4vw, 1.6rem);
-}
-
-h2 {
-  font-size: 1rem;
-  margin-bottom: var(--space-2);
-}
-
-ul {
-  padding: 0;
-  list-style: none;
-}
-
-img,
-canvas {
-  max-width: 100%;
-}
-
-input,
-select,
-button {
-  font-family: inherit;
-  font-size: 16px;
-}
-
-button {
-  cursor: pointer;
-}
-
-.app-main {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-3);
-  box-shadow: var(--shadow);
-}
-
-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-3);
-}
-
-.chart-wrapper {
-  position: relative;
-  height: 300px;
-}
-
-.scrollable {
-  max-height: 420px;
-  overflow-y: auto;
-}
-
-.hidden {
-  display: none !important;
-}
-
-.empty-state {
-  text-align: center;
-  color: var(--text-muted);
-  padding: var(--space-4) 0;
-}
-
-.error-message {
-  color: var(--danger);
-  font-size: .9rem;
-  margin-top: var(--space-2);
-}
-
-.field-error {
-  color: var(--danger);
-  font-size: .8rem;
-  margin-top: 2px;
-}
-
-.storage-error {
-  background: color-mix(in srgb, var(--danger) 12%, transparent);
-  border: 1px solid var(--danger);
-  color: var(--danger);
-  border-radius: var(--space-1);
-  padding: var(--space-2);
-  margin-bottom: var(--space-3);
-  font-size: .85rem;
-}
-
-.error-message:empty,
-.field-error:empty {
-  display: none;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  margin-bottom: var(--space-2);
-}
-
-.field label {
-  font-size: .85rem;
-  color: var(--text-muted);
-}
-
-.field input,
-.field select {
-  width: 100%;
-  padding: var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: var(--space-1);
-  background: var(--bg);
-  color: var(--text);
-}
-
-.field input:focus,
-.field select:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
-#transaction-form button[type="submit"] {
-  width: 100%;
-  min-height: 44px;
-  border: 0;
-  border-radius: var(--space-1);
-  background: var(--accent);
-  color: #fff;
-  font-weight: 600;
-}
-
-#balance-display {
-  font-size: clamp(1.75rem, 7vw, 2.5rem);
-  font-weight: 700;
-}
-
-.transaction-item {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border-bottom: 1px solid var(--border);
-}
-
-.transaction-item:last-child {
-  border-bottom: 0;
-}
-
-.transaction-name {
-  flex: 1;
-  overflow-wrap: anywhere;
-}
-
-.transaction-amount {
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-}
-
-.transaction-category {
-  font-size: .75rem;
-  color: var(--text-muted);
-}
-
-.delete-btn {
-  min-height: 44px;
-  min-width: 44px;
-  border: 1px solid var(--border);
-  border-radius: var(--space-1);
-  background: transparent;
-  color: var(--danger);
-}
-
-.category-add {
-  min-height: 44px;
-  display: flex;
-  gap: var(--space-2);
-  margin-bottom: var(--space-2);
-}
-
-.category-add input {
-  flex: 1;
-  min-width: 0;
-  padding: var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: var(--space-1);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 16px;
-}
-
-.category-add button {
-  padding: 0 var(--space-3);
-  min-height: 44px;
-  border: 0;
-  border-radius: var(--space-1);
-  background: var(--accent);
-  color: #fff;
-  font-weight: 600;
-}
-
-.category-add button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
-.category-count {
-  color: var(--text-muted);
-  font-size: .8rem;
-  margin-bottom: var(--space-1);
-}
-
-.category-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding: var(--space-1) 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.category-list li:last-child {
-  border-bottom: 0;
-}
-
-.category-list-empty {
-  color: var(--text-muted);
-  font-size: .85rem;
-  border-bottom: 0;
-}
-
-.remove-category-btn {
-  min-height: 44px;
-  min-width: 44px;
-  border: 1px solid var(--border);
-  border-radius: var(--space-1);
-  background: transparent;
-  color: var(--danger);
-}
-
-.over-limit {
-  background: rgba(220, 38, 38, 0.10);
-}
-
-.transaction-item.over-limit {
-  box-shadow: inset 3px 0 0 var(--danger);
-}
-
-.limit-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.limit-row {
-  min-height: 40px;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  padding: var(--space-1) 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.limit-row:last-child {
-  border-bottom: 0;
-}
-
-.limit-category {
-  flex: 1 1 80px;
-  min-width: 80px;
-}
-
-.limit-row input {
-  width: 130px;
-  padding: var(--space-1);
-  border: 1px solid var(--border);
-  border-radius: var(--space-1);
-  background: var(--bg);
-  color: var(--text);
-  font-size: 16px;
-}
+/* ==========================================================================
+   Expense & Budget Visualizer
+
+   Layers are declared in priority order. Later layers win over earlier ones
+   regardless of selector specificity, so new rules can be added to the
+   matching layer instead of reaching for !important or longer selectors.
+
+     tokens    design tokens (colors, spacing, radii)
+     base      element defaults and reset
+     layout    page structure (header, main, sections)
+     components  everything that renders a visible component
+     utilities   single-purpose helpers
+     overrides   late, one-off experiments
+
+   Add a new rule to "components" to restyle a component. Add it to
+   "overrides" for a one-off that must beat every component rule.
+   ========================================================================== */
+
+@layer tokens, base, layout, components, utilities, overrides;
+
+/* ==========================================================================
+   Tokens
+   ========================================================================== */
+
+@layer tokens {
+  :root {
+    color-scheme: light;
+
+    /* surfaces */
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface-2: #eef1f5;
+    --control-bg: #f5f6f8;
+
+    /* text */
+    --text: #1c1f24;
+    --text-muted: #667085;
+
+    /* lines and focus */
+    --border: #e2e5ea;
+    --border-strong: #c9ced6;
+    --focus: #2563eb;
+
+    /* actions */
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-active: #1e40af;
+    --on-accent: #ffffff;
+
+    /* feedback */
+    --danger: #dc2626;
+    --danger-soft: rgb(220 38 38 / .10);
+    --success: #15803d;
+
+    /* shape */
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 1px 3px rgb(0 0 0 / .08);
+
+    /* spacing */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #12151b;
+    --surface: #1b1f27;
+    --surface-2: #232834;
+    --control-bg: #12151b;
+
+    --text: #e8eaee;
+    --text-muted: #9aa3b2;
+
+    --border: #2a303b;
+    --border-strong: #3a4250;
+    --focus: #93c5fd;
+
+    --accent: #60a5fa;
+    --accent-hover: #93c5fd;
+    --accent-active: #bfdbfe;
+    --on-accent: #0b1220;
+
+    --danger: #f87171;
+    --danger-soft: rgb(248 113 113 / .12);
+    --success: #4ade80;
+
+    --shadow: 0 1px 3px rgb(0 0 0 / .4);
+  }
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: var(--space-3);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 1.5;
+    background: var(--bg);
+    color: var(--text);
+    max-width: 720px;
+  }
+
+  h1,
+  h2,
+  p,
+  ul {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(1.25rem, 4vw, 1.6rem);
+  }
+
+  h2 {
+    font-size: 1rem;
+    margin-bottom: var(--space-2);
+  }
+
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  img,
+  canvas {
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  button {
+    font-family: inherit;
+    font-size: 16px;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
+@layer layout {
+  .app-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-3);
+    box-shadow: var(--shadow);
+  }
+
+  header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+  }
+
+  .chart-wrapper {
+    position: relative;
+    height: 300px;
+  }
+
+  .scrollable {
+    max-height: 420px;
+    overflow-y: auto;
+  }
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+
+@layer components {
+  /* ------------------------------------------------------------------------
+     Shared form controls
+     Every text field, number field and select uses the same box, the same
+     hover border, the same focus ring and the same placeholder colour.
+     ------------------------------------------------------------------------ */
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-bottom: var(--space-2);
+  }
+
+  .field label {
+    font-size: .85rem;
+    color: var(--text-muted);
+  }
+
+  .field input,
+  .field select,
+  .category-add input,
+  .limit-row input,
+  #sort-select {
+    min-height: 44px;
+    padding: var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--control-bg);
+    color: var(--text);
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+  }
+
+  .field input::placeholder,
+  .category-add input::placeholder,
+  .limit-row input::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+
+  @media (hover: hover) {
+    .field input:hover,
+    .field select:hover,
+    .category-add input:hover,
+    .limit-row input:hover,
+    #sort-select:hover {
+      border-color: var(--border-strong);
+    }
+  }
+
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .category-add input:focus-visible,
+  .limit-row input:focus-visible,
+  #sort-select:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .field input:disabled,
+  .field select:disabled,
+  .category-add input:disabled,
+  .limit-row input:disabled,
+  #sort-select:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+  }
+
+  /* ------------------------------------------------------------------------
+     Buttons
+     Primary  — solid accent, used to submit.
+     Ghost    — bordered surface button, used for the theme toggle.
+     Danger   — transparent with a red glyph, used for delete/remove.
+     ------------------------------------------------------------------------ */
+
+  #transaction-form button[type="submit"],
+  .category-add button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 600;
+    transition: background-color .15s ease, transform .05s ease;
+  }
+
+  #transaction-form button[type="submit"] {
+    width: 100%;
+  }
+
+  @media (hover: hover) {
+    #transaction-form button[type="submit"]:hover,
+    .category-add button:hover {
+      background: var(--accent-hover);
+    }
+  }
+
+  #transaction-form button[type="submit"]:active,
+  .category-add button:active {
+    background: var(--accent-active);
+    transform: translateY(1px);
+  }
+
+  #transaction-form button[type="submit"]:focus-visible,
+  .category-add button:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .category-add button:disabled {
+    opacity: .5;
+    background: var(--accent);
+    transform: none;
+  }
+
+  #theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 var(--space-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.1rem;
+    transition: background-color .15s ease, border-color .15s ease, transform .05s ease;
+  }
+
+  @media (hover: hover) {
+    #theme-toggle:hover {
+      background: var(--surface-2);
+      border-color: var(--border-strong);
+    }
+  }
+
+  #theme-toggle:active {
+    transform: translateY(1px);
+  }
+
+  #theme-toggle:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .delete-btn,
+  .remove-category-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--danger);
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: background-color .15s ease, border-color .15s ease, transform .05s ease;
+  }
+
+  @media (hover: hover) {
+    .delete-btn:hover,
+    .remove-category-btn:hover {
+      background: var(--danger-soft);
+      border-color: var(--danger);
+    }
+  }
+
+  .delete-btn:active,
+  .remove-category-btn:active {
+    transform: translateY(1px);
+  }
+
+  .delete-btn:focus-visible,
+  .remove-category-btn:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* ------------------------------------------------------------------------
+     Header, balance and sort
+     ------------------------------------------------------------------------ */
+
+  #balance-display {
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
+    font-weight: 700;
+  }
+
+  #sort-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  #sort-section label {
+    color: var(--text-muted);
+    font-size: .9rem;
+  }
+
+  /* ------------------------------------------------------------------------
+     Transaction list
+     ------------------------------------------------------------------------ */
+
+  .transaction-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border-bottom: 1px solid var(--border);
+    transition: background-color .15s ease;
+  }
+
+  .transaction-item:last-child {
+    border-bottom: 0;
+  }
+
+  @media (hover: hover) {
+    .transaction-item:hover {
+      background: var(--surface-2);
+    }
+
+    .transaction-item.over-limit:hover {
+      background: color-mix(in srgb, var(--danger) 16%, transparent);
+    }
+  }
 
-.limit-spent {
-  font-size: .8rem;
-  color: var(--text-muted);
-}
-
-.limit-row.over-limit .limit-spent {
-  color: var(--danger);
-  font-weight: 600;
-}
-
-.summary-month {
-  color: var(--text-muted);
-  font-size: .85rem;
-  margin-bottom: var(--space-1);
-}
-
-.summary-total {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--border);
-  margin-bottom: var(--space-2);
-}
-
-.summary-total strong {
-  font-size: 1.25rem;
-}
-
-.summary-breakdown {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 var(--space-2);
-}
-
-.summary-breakdown li {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-2);
-  padding: var(--space-1) 0;
-  font-size: .9rem;
-}
-
-.summary-empty {
-  color: var(--text-muted);
-}
-
-.summary-comparison {
-  font-size: .85rem;
-  margin-bottom: var(--space-1);
-}
-
-.summary-comparison.increase {
-  color: var(--danger);
-}
-
-.summary-comparison.decrease {
-  color: #16a34a;
-}
-
-.summary-comparison.neutral {
-  color: var(--text-muted);
-}
-
-.summary-average {
-  color: var(--text-muted);
-  font-size: .85rem;
-}
-
-#theme-toggle {
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0 var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: var(--space-1);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 1.1rem;
-}
-
-#sort-section {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-#sort-select {
-  min-height: 44px;
-  padding: 0 var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: var(--space-1);
-  background: var(--surface);
-  color: var(--text);
-}
-
-.limit-row input {
-  min-height: 40px;
-}
-/* Narrow phones: give the transaction name its own line so it never
-   breaks mid-word next to the amount, category and delete button. */
-@media (max-width: 380px) {
   .transaction-name {
-    flex: 1 1 100%;
+    flex: 1;
+    overflow-wrap: anywhere;
   }
 
   .transaction-amount {
-    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
   }
+
+  .transaction-category {
+    font-size: .75rem;
+    color: var(--text-muted);
+  }
+
+  /* ------------------------------------------------------------------------
+     Custom category settings
+     ------------------------------------------------------------------------ */
+
+  .category-add {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .category-add input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .category-count {
+    color: var(--text-muted);
+    font-size: .8rem;
+    margin-bottom: var(--space-1);
+  }
+
+  .category-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-1) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .category-list li:last-child {
+    border-bottom: 0;
+  }
+
+  .category-list-empty {
+    color: var(--text-muted);
+    font-size: .85rem;
+    border-bottom: 0;
+  }
+
+  /* ------------------------------------------------------------------------
+     Spending limits
+     ------------------------------------------------------------------------ */
+
+  .limit-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .limit-row {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    padding: var(--space-1) var(--space-2);
+    border-bottom: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: background-color .15s ease;
+  }
+
+  .limit-row:last-child {
+    border-bottom: 0;
+  }
+
+  @media (hover: hover) {
+    .limit-row:hover {
+      background: var(--surface-2);
+    }
+  }
+
+  .limit-category {
+    flex: 1 1 80px;
+    min-width: 80px;
+  }
+
+  .limit-row input {
+    width: 130px;
+  }
+
+  .limit-spent {
+    font-size: .8rem;
+    color: var(--text-muted);
+  }
+
+  .limit-row.over-limit .limit-spent {
+    color: var(--danger);
+    font-weight: 600;
+  }
+
+  .over-limit {
+    background: var(--danger-soft);
+  }
+
+  .transaction-item.over-limit {
+    box-shadow: inset 3px 0 0 var(--danger);
+  }
+
+  /* ------------------------------------------------------------------------
+     Monthly summary
+     ------------------------------------------------------------------------ */
+
+  .summary-month {
+    color: var(--text-muted);
+    font-size: .85rem;
+    margin-bottom: var(--space-1);
+  }
+
+  .summary-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-2);
+  }
+
+  .summary-total strong {
+    font-size: 1.25rem;
+  }
+
+  .summary-breakdown {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-2);
+  }
+
+  .summary-breakdown li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-1) 0;
+    font-size: .9rem;
+  }
+
+  .summary-empty {
+    color: var(--text-muted);
+  }
+
+  .summary-comparison {
+    font-size: .85rem;
+    margin-bottom: var(--space-1);
+  }
+
+  .summary-comparison.increase {
+    color: var(--danger);
+  }
+
+  .summary-comparison.decrease {
+    color: var(--success);
+  }
+
+  .summary-comparison.neutral {
+    color: var(--text-muted);
+  }
+
+  .summary-average {
+    color: var(--text-muted);
+    font-size: .85rem;
+  }
+
+  /* ------------------------------------------------------------------------
+     Empty states and messages
+     ------------------------------------------------------------------------ */
+
+  .empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: var(--space-4) 0;
+  }
+
+  .error-message {
+    color: var(--danger);
+    font-size: .9rem;
+    margin-top: var(--space-2);
+  }
+
+  .field-error {
+    color: var(--danger);
+    font-size: .8rem;
+    margin-top: 2px;
+  }
+
+  .error-message:empty,
+  .field-error:empty {
+    display: none;
+  }
+
+  .storage-error {
+    background: var(--danger-soft);
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2);
+    margin-bottom: var(--space-3);
+    font-size: .85rem;
+  }
+
+  /* ------------------------------------------------------------------------
+     Narrow phones
+     Give the transaction name its own line so it never breaks mid-word
+     next to the amount, category and delete button.
+     ------------------------------------------------------------------------ */
+
+  @media (max-width: 380px) {
+    .transaction-name {
+      flex: 1 1 100%;
+    }
+
+    .transaction-amount {
+      margin-left: auto;
+    }
+  }
+}
+
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+@layer utilities {
+  .hidden {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: .01ms;
+      animation-duration: .01ms;
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* ==========================================================================
+   Overrides
+   One-off changes that must beat every component rule live here.
+   ========================================================================== */
+
+@layer overrides {
 }
