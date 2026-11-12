@@ -252,6 +252,10 @@ const wireEvents = () => {
     if (!btn) return;
     deleteTransaction(btn.dataset.id);
   })
+  document.querySelector('#theme-toggle').addEventListener('click', () => {
+    toggleTheme();
+    applyTheme();
+  });
 }
 
 const renderTransactionList = () => {
@@ -377,6 +381,21 @@ const renderPieChart = () => {
   })
 }
 
+const applyTheme = () => {
+  document.documentElement.dataset.theme = state.theme;
+  document.querySelector('#theme-toggle').textContent = state.theme === 'dark' ? '☀️' : '🌙';
+  if (pieChart) {
+    pieChart.options.plugins.legend.labels.color = getComputedStyle(document.body).color;
+    pieChart.update('none');
+  }
+}
+
+const toggleTheme = () => {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  persist();
+  applyTheme();
+}
+
 const render = () => {
   renderBalance();
   renderTransactionList();
@@ -396,6 +415,7 @@ const init = () => {
   renderCategoryOptions();
   subscribe(render);
   wireEvents();
+  applyTheme();
   render();
 }
 
