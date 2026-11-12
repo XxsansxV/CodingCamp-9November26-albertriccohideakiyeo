@@ -339,6 +339,7 @@ const renderPieChart = () => {
       datasets: [{
         data: values,
         backgroundColor: colors,
+        borderWidth: 0,
       }]
     },
     options: {
@@ -364,7 +365,7 @@ const renderPieChart = () => {
         tooltip: {
           callbacks: {
             label(ctx) {
-              const data = ctx.datasets.data;
+              const data = ctx.dataset.data;
               const total = data.reduce((a, b) => a + b, 0);
               const pct = total ? Math.round((ctx.parsed / total) * 100) : 0;
               return `${ctx.label}: ${formatCurrency(ctx.parsed)} (${pct}%)`;
