@@ -150,7 +150,9 @@ const hydrate = () => {
 }
 
 const persist = () => {
-  return saveToStorage(STORAGE_KEYS.transactions, state.transactions) && saveToStorage(STORAGE_KEYS.categories, state.customCategories) && saveToStorage(STORAGE_KEYS.limits, state.spendingLimits) && saveToStorage(STORAGE_KEYS.settings, { theme: state.theme, sortMethod: state.sortMethod, }) ;
+  const saved = saveToStorage(STORAGE_KEYS.transactions, state.transactions) && saveToStorage(STORAGE_KEYS.categories, state.customCategories) && saveToStorage(STORAGE_KEYS.limits, state.spendingLimits) && saveToStorage(STORAGE_KEYS.settings, { theme: state.theme, sortMethod: state.sortMethod, });
+  if (saved) hideStorageError();
+  return saved;
 }
 
 // =-=-=-=-=-=-= [ 5 | STATE OPS ] =-=-=-=-=-=-=-=
@@ -229,6 +231,12 @@ const showStorageError = (message) => {
   const el = document.querySelector('#storage-error');
   el.textContent = message;
   el.classList.remove('hidden');
+}
+
+const hideStorageError = () => {
+  const el =document.querySelector('#storage-error');
+  el.classList.add('hidden');
+  el.textContent = '';
 }
 
 const clearFormErrors = () => {
