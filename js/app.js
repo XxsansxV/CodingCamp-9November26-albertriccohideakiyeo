@@ -462,7 +462,7 @@ const renderCategorySettings = () => {
 
   const form = document.createElement('form');
   form.id = 'category-form';
-  form.id = 'category-add';
+  form.className = 'category-add';
   const input = document.createElement('input');
   input.id = 'new-category';
   input.type = 'text';
@@ -517,7 +517,7 @@ const addCategory = (name) => {
   const trimmed = name.trim();
   if (!validateCategoryName(trimmed)) throw new Error(`Category name must be 1-${MAX_CATEGORY_NAME}`);
   if (state.customCategories.length >= MAX_CUSTOM_CATEGORIES) throw new Error(`Maximum ${MAX_CUSTOM_CATEGORIES} categories reached`);
-  if (getAllCategoryNames().some(c => c.toLowerCase() === trimmed.toLowerCase())) throw new Error('That category alreaedy exists');
+  if (getAllCategoryNames().some(c => c.toLowerCase() === trimmed.toLowerCase())) throw new Error('That category already exists');
 
   state.customCategories.push({ id: generateId(), name: trimmed, isDefault: false});
   if (!persist()) {
@@ -544,11 +544,6 @@ const removeCategory = (id) => {
   renderCategorySettings();
   notify();
   return true;
-
-  renderCategoryOptions();
-  renderCategorySettings();
-  notify();
-  return true;
 }
 
 const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : str;
@@ -556,6 +551,7 @@ const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : 
 const init = () => {
   hydrate();
   renderCategoryOptions();
+  renderCategorySettings();
   subscribe(render);
   wireEvents();
   applyTheme();
