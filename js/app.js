@@ -549,13 +549,20 @@ const addCategory = (name) => {
 }
 
 const removeCategory = (id) => {
+  const removed = state.customCategories.find(c => c.id === id);
   const before = state.customCategories;
   const next = before.filter(c => c.id !== id);
   if (next.length === before.length) return false;
 
+  const previousLimit = removed ? state.spendingLimits[removed.name] : undefined;
+  const hadLimit = removed ? removed.name in state.spendingLimits : false;
+
   state.customCategories = next;
+  if (hadLimit) delete state.spendingLimits[removed.name];
+  
   if (!persist()) {
     state.customCategories = before;
+    if (hadLimit) state.spendingLimits[removed.name] = previousLimit;
     throw new Error('Could not remove category. Storage is unavailable.');
   }
 
@@ -566,7 +573,7 @@ const removeCategory = (id) => {
 }
 
 const getSpendingByCategory = () => {
-  calculateCategoryTotals(state.transactions);
+  return calculateCategoryTotals(state.transactions);
 }
 
 const isOverLimit = (category) => {
