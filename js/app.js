@@ -141,6 +141,7 @@ const hydrate = () => {
       state.sortMethod = settings.sortMethod;
     }
   }
+  document.querySelector("#sort-select").value = state.sortMethod;
 }
 
 const persist = () => {
@@ -254,7 +255,6 @@ const wireEvents = () => {
   })
   document.querySelector('#theme-toggle').addEventListener('click', () => {
     toggleTheme();
-    applyTheme();
   });
   document.querySelector('#sort-select').addEventListener('change', (e) => {
     setSortMethod(e.target.value)
