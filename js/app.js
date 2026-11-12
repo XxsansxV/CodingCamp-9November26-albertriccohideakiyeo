@@ -18,6 +18,10 @@ const STORAGE_KEYS = {
   settings: 'expense_settings',
 };
 
+const CHART_COLORS = [
+  '#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#7c3aed',
+  '#0891b2', '#db2777', '#65a30d', '#ea580c', '#4f46e5',
+];
 
 // =-=-=-=-=-=-= [ 2 | STATE ] =-=-=-=-=-=-=-=
 
@@ -44,7 +48,7 @@ const generateId = () => {
 const validateAmount = (value) => {
   value = Number(value);
 
-  if (isFinite(value) && value >= MIN_AMOUNT && value <= MAX_AMOUNT && value !== 0) {
+;  if (isFinite(value) && value >= MIN_AMOUNT && value <= MAX_AMOUNT && value !== 0) {
     return true;
   }
 
@@ -250,19 +254,6 @@ const wireEvents = () => {
   })
 }
 
-const render = () => {
-  renderBalance();
-  renderTransactionList();
-}
-
-const getVisibleTransactions = () => {
-  return [...state.transactions]
-    .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
-    .slice(0, LIST_LIMIT)
-}
-
-const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : str;
-
 const renderTransactionList = () => {
   const list = document.querySelector("#transaction-list");
   list.replaceChildren();
@@ -293,7 +284,110 @@ const renderTransactionList = () => {
     li.append(name, amount, category, del);
     list.appendChild(li);
   }
+
+  document.querySelector("#list-empty").classList.toggle('hidden', state.transactions.length > 0);
 }
+
+let pieChart = null;
+
+const calculateCategoryTotals = (transaction) => {
+  return transaction.reduce((totals, t) => {
+    totals[t.category] = (totals[t.category] ?? 0) + t.amount;
+    return totals;
+  }, {})
+}
+
+const renderPieChart = () => {
+  const wrapper = document.querySelector(".chart-wrapper");
+  const empty = document.querySelector("#chart-empty");
+
+  if (typeof Chart === 'undefined') {
+    wrapper.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  const total = calculateCategoryTotals(state.transactions);
+  const labels = Object.keys(total);
+  const values = labels.map((label) => total[label]);
+  const grandTotal = values.reduce((sum, value) => sum + value, 0);
+
+  if (grandTotal === 0) {
+    if (pieChart) { pieChart.destroy(); pieChart = null; }
+    wrapper.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return
+  }
+
+  wrapper.classList.remove('hidden');
+  empty.classList.add('hidden');
+
+  const colors = labels.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]);
+
+  if (pieChart) {
+    pieChart.data.labels = labels;
+    pieChart.data.datasets[0].data = values;
+    pieChart.data.datasets[0].backgroundColor = colors;
+    pieChart.update();
+    return;
+  }
+
+  pieChart = new Chart(document.querySelector("#pie-chart"), {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: getComputedStyle(document.body).color,
+            generateLabels(chart) {
+              const data = chart.data.datasets[0].data;
+              const total = data.reduce((a, b) => a + b, 0);
+              return chart.data.labels.map((label, i) => ({
+                text: `${label} (${total ? Math.round((data[i] / total) * 100) : 0}%)`,
+                fillStyle: chart.data.datasets[0].backgroundColor[i],
+                strokeStyle: chart.data.datasets[0].backgroundColor[i],
+                index: i,
+              }))
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label(ctx) {
+              const data = ctx.datasets.data;
+              const total = data.reduce((a, b) => a + b, 0);
+              const pct = total ? Math.round((ctx.parsed / total) * 100) : 0;
+              return `${ctx.label}: ${formatCurrency(ctx.parsed)} (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  })
+}
+
+const render = () => {
+  renderBalance();
+  renderTransactionList();
+}
+
+const getVisibleTransactions = () => {
+  return [...state.transactions]
+    .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+    .slice(0, LIST_LIMIT)
+}
+
+const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : str;
 
 const init = () => {
   hydrate();
