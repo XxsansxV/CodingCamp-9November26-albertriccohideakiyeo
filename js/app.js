@@ -285,7 +285,7 @@ const wireEvents = () => {
     try {
       deleteTransaction(btn.dataset.id);
     } catch (err) {
-      
+      // Error is already handled and shown.
     }
   })
   document.querySelector('#theme-toggle').addEventListener('click', () => {
