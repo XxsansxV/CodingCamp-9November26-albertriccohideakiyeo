@@ -21,15 +21,21 @@
 			<section id="form-section">
 				<h2>Add Transaction</h2>
 				<form id="transaction-form" novalidate>
-					<label for="item-name">Item Name</label>
-					<input id="item-name" class="field" type="text" maxlength="100">
-					<p id="item-name-error" class="field-error"></p>
-					<label for="amount">Amount (Rp)</label>
-					<input id="amount" class="field" type="number" min="0.01" max="9999999999.99" step="0.01">
-					<p id="amount-error" class="field-error"></p>
-					<label for="category">Category</label>
-					<select id="category" class="field"></select>
-					<p id="category-error" class="field-error"></p>
+					<div class="field">
+						<label for="item-name">Item Name</label>
+						<input id="item-name" type="text" maxlength="100">
+						<p id="item-name-error" class="field-error"></p>
+					</div>
+					<div class="field">
+						<label for="amount">Amount (Rp)</label>
+						<input id="amount" type="number" min="0.01" max="9999999999.99" step="0.01">
+						<p id="amount-error" class="field-error"></p>
+					</div>
+					<div class="field">
+						<label for="category">Category</label>
+						<select id="category"></select>
+						<p id="category-error" class="field-error"></p>
+					</div>
 					<button type="submit">Add Transaction</button>
 				</form>
 				<p id="form-error" class="error-message" role="alert"></p>
