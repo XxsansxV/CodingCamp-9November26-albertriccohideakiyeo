@@ -251,6 +251,7 @@ const wireEvents = () => {
 
 const render = () => {
   renderBalance();
+  renderTransactionList();
 }
 
 const getVisibleTransactions = () => {
@@ -259,13 +260,13 @@ const getVisibleTransactions = () => {
     .slice(0, LIST_LIMIT)
 }
 
-const truncate = (str, max) => str.length > max ? `${str.slice(0, max-1)}...` : str;
+const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : str;
 
 const renderTransactionList = () => {
   const list = document.querySelector("#transaction-list");
   list.replaceChildren();
 
-  getVisibleTransactions().map((item) => {
+  for (const item of getVisibleTransactions()) {
     const li = document.createElement('li');
     li.className = 'transaction-item';
 
@@ -273,12 +274,24 @@ const renderTransactionList = () => {
     name.className = 'transaction-name';
     name.textContent = truncate(item.itemName, 50);
 
+    const amount = document.createElement('span');
+    amount.className = 'transaction-amount';
+    amount.textContent = formatCurrency(item.amount);
+
+    const category = document.createElement('span');
+    category.className = 'transaction-category';
+    category.textContent = item.category
+
     const del = document.createElement('button');
     del.type = 'button';
     del.className = 'delete-btn';
     del.dataset.id = item.id;
     del.setAttribute('aria-label', `Delete ${item.itemName}`);
-  })
+    del.textContent = '×';
+
+    li.append(name, amount, category, del);
+    list.appendChild(li);
+  }
 }
 
 const init = () => {
@@ -289,4 +302,4 @@ const init = () => {
   render();
 }
 
-document.addEventListener('DOMContentLoaded', init());
+document.addEventListener('DOMContentLoaded', init);
