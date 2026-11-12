@@ -97,7 +97,7 @@ const loadFromStorage = (key, fallback = null) => {
     }
     return JSON.parse(unprocessed);
   } catch (err) {
-    return null;
+    return fallback;
   }
 }
 
@@ -127,7 +127,7 @@ const hydrate = () => {
   const settings = loadFromStorage(STORAGE_KEYS.settings, {});
 
   state.transactions = Array.isArray(transactions) ? transactions : [];
-  state.categories = Array.isArray(categories) ? categories : [];
+  state.customCategories = Array.isArray(categories) ? categories : [];
   state.spendingLimits =(limits && typeof(limits) === 'object' && !Array.isArray(limits)) ? limits : {};
   if (settings && typeof(settings) === 'object') {
     if (settings.theme === 'light' || settings.theme === 'dark') {
@@ -144,4 +144,39 @@ const persist = () => {
 }
 
 // =-=-=-=-=-=-= [ 5 | STATE OPS ] =-=-=-=-=-=-=-=
-// TODO
+
+const addTransaction = (itemName, amount, category) => {  
+  if (!validateItemName(itemName)) throw new Error('Item name is required! (Max 100 characters)');
+  if (!validateAmount(amount)) throw new Error(`Amount must be between ${MIN_AMOUNT} and ${MAX_AMOUNT}!`);
+  if (typeof(category)!=='string' || category.trim()==='') throw new Error('Category is required.');
+  if (state.transactions.length >= MAX_TRANSACTIONS) throw new Error(`You tried adding another transaction, but max is ${MAX_TRANSACTIONS}`);
+
+  const transaction = {
+    id: generateId(),
+    itemName: itemName.trim(),
+    amount: Number(amount),
+    category: category.trim(),
+    timestamp: formatTimestamp(new Date()),
+  }
+  state.transactions.push(transaction);
+  persist();
+  notify();
+  return transaction;
+}
+
+const deleteTransaction = (id) => {
+  const index = state.transactions.findIndex((item) => item.id === id);
+  if (index !== -1) return false;
+  state.transactions.splice(index, 1);
+  persist();
+  notify();
+  return true;
+}
+
+const getTransaction = (id) => {
+  return state.transactions.find((item) => item.id === id);
+}
+
+const getBalance = () => {
+  return state.transactions.reduce((sum, trans) => sum + trans.amount, 0);
+}
