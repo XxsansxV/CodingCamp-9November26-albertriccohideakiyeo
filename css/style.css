@@ -335,3 +335,63 @@ header {
   color: var(--danger);
   font-weight: 600;
 }
+
+.summary-month {
+  color: var(--text-muted);
+  font-size: .85rem;
+  margin-bottom: var(--space-1);
+}
+
+.summary-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-2);
+}
+
+.summary-total strong {
+  font-size: 1.25rem;
+}
+
+.summary-breakdown {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-2);
+}
+
+.summary-breakdown li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+  font-size: .9rem;
+}
+
+.summary-empty {
+  color: var(--text-muted);
+}
+
+.summary-comparison {
+  font-size: .85rem;
+  margin-bottom: var(--space-1);
+}
+
+.summary-comparison.increase {
+  color: var(--danger);
+}
+
+.summary-comparison.decrease {
+  color: #16a34a;
+}
+
+.summary-comparison.neutral {
+  color: var(--text-muted);
+}
+
+.summary-average {
+  color: var(--text-muted);
+  font-size: .85rem;
+}

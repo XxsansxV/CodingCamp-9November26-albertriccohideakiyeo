@@ -446,6 +446,7 @@ const render = () => {
   renderTransactionList();
   renderPieChart();
   renderLimitSettings();
+  renderMonthlySummary();
 }
 
 const getVisibleTransactions = () => {
@@ -682,6 +683,66 @@ const getMonthlySummary = () => {
     dailyAverage: total / daysInMonth,
     daysInMonth,
   };
+}
+
+const renderMonthlySummary = () => {
+  const container = document.querySelector('#monthly-summary');
+  container.replaceChildren();
+
+  const s = getMonthlySummary();
+
+  const heading = document.createElement('p');
+  heading.className = 'summary-month';
+  heading.textContent = s.monthLabel;
+
+  const totalRow = document.createElement('div');
+  totalRow.className = 'summary-total';
+  const totalLabel = document.createElement('span');
+  totalLabel.textContent = 'Total this month';
+  const totalValue = document.createElement('strong');
+  totalValue.textContent = formatCurrency(s.total);
+  totalRow.append(totalLabel, totalValue);
+
+  const list = document.createElement('ul');
+  list.className = 'summary-breakdown';
+  const entries = Object.entries(s.breakdown).sort((a, b) => b[1] - a[1]);
+  if (entries.length === 0) {
+    const empty = document.createElement('li');
+    empty.className = 'summary-empty';
+    empty.textContent = 'No transactions this month';
+    list.appendChild(empty);
+  } else {
+    for (const [category, amount] of entries) {
+      const li = document.createElement('li');
+      const name = document.createElement('span');
+      name.textContent = category;
+      const value = document.createElement('span');
+      value.textContent = formatCurrency(amount);
+      li.append(name, value);
+      list.appendChild(li);
+    }
+  }
+
+  const comparison = document.createElement('p');
+  comparison.className = 'summary-comparison';
+
+  if (!hasPrevious) {
+    comparison.textContent = 'No previous month data';
+    comparison.classList.add('neutral');
+  } else if (s.diff === 0) {
+    comparison.textContent = 'Same as last month (0%)';
+    comparison.classList.add('neutral');
+  } else {
+    const sign = s.diff > 0 ? '+' : '-';
+    comparison.textContent = `${sign}${formatCurrency(Math.abs(s.diff))} (${sign}${Math.abs(s.percent).toFixed(1)}%) vs last month`
+    comparison.classList.add(s.diff > 0 ? 'increase' : 'decrease');
+  }
+
+  const average = document.createElement('p');
+  average.className = 'summary-average';
+  average.textContent = `Daily average: ${formatCurrency(s.dailyAverage)} (over ${daysInMonth} days)`;
+
+  container.append(heading, totalRow, list, comparison, average);
 }
 
 const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : str;
