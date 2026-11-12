@@ -67,7 +67,8 @@ const validateCategoryName = (value) => {
 }
 
 const validateLimit = (value) => {
-  return isFinite(Number(value) && Number(value) >= MIN_LIMIT && Number(value) <= MAX_LIMIT && Number(value) !== 0);
+  const n = Number(value);
+  return Number.isFinite(n) && n >= MIN_LIMIT && n <= MAX_LIMIT;
 }
 
 
@@ -544,6 +545,88 @@ const removeCategory = (id) => {
   renderCategorySettings();
   notify();
   return true;
+}
+
+const getSpendingByCategory = () => {
+  calculateCategoryTotals(state.transactions);
+}
+
+const isOverLimit = (category) => {
+  const limit = state.spendingLimits[category];
+  if (typeof limit !== 'number') return false;
+  return (getSpendingByCategory()[category] ?? 0) >= limit;
+}
+
+const setSpendingLimit = (category, rawValue) => {
+  const previous = state.spendingLimits[category];
+  if (String(rawValue).trim() === ''){
+    delete state.spendingLimits[category];
+    if (!persist()) {
+      state.spendingLimits[category] = previous;
+      throw new Error('Could not save the liit. Storage is unavailable.');
+    }
+    notify();
+    return;
+  }
+
+  if (!validateLimit(rawValue)) {
+    throw new Error(`Limit must be between ${formatCurrency(MIN_LIMIT)} and ${formatCurrency(MAX_LIMIT)}`);
+  }
+
+  state.spendingLimits[category] = Number(rawValue);
+  if (!persist()) {
+    if (previous === undefined) delete state.spendingLimits[category];
+    else state.spendingLimits[category] = previous;
+    throw new Error('Could not save the limit. Storage is unavailable.');
+  }
+  notify();
+}
+
+const renderLimitSettings = () => {
+  const container = document.querySelector('#limit-settings');
+  container.replaceChildren();
+
+  const heading = document.createElement('p');
+  heading.className = 'category-count';
+  heading.textContent = 'Spending Limits';
+  container.appendChild(heading);
+
+  const list = document.createElement('ul');
+  list.className = 'limit-list';
+
+  const spent = getSpendingByCategory();
+
+  getAllCategoryNames.forEach((category) => {
+    const li = document.createElement('li');
+    li.className = 'limit-row';
+    if (isOverLimit(category)) li.classList.add('over-limit');
+
+    const name = document.createElement('span');
+    name.className = 'limit-category';
+    name.textContent = category;
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = MIN_LIMIT;
+    input.max = MAX_LIMIT;
+    input.step = '0.01';
+    input.inputMode = 'decimal';
+    input.placeholder = 'No LImit';
+    input.dataset.limitCategory = category;
+    input.setAttribute('aria-label', `Spending limit for ${category}`);
+    if (state.spendingLimits[category] !== undefined) {
+      input.value = state.spendingLimits[category];
+    }
+
+    const info = document.createElement('span');
+    info.className = 'limit-spent';
+    info.textContent = isOverLimit(category) ? `Over limit, ${formatCurrency(spent[category])} spent` : `${formatCurrency(spent[category] ?? 0)} spent`;
+
+    li.append(name, input, info);
+    list.appendChild(li);
+  })
+
+  container.appendChild(list);
 }
 
 const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : str;
