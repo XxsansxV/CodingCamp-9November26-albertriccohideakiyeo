@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Expense & budget visualizer</title>
 		<link rel="stylesheet" href="./css/style.css">
-		<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script defer src="https://cdnjs.com/libraries/Chart.js"></script>
 		<script defer src="./js/app.js"></script>
 	</head>
 	<body>
@@ -22,13 +22,13 @@
 				<h2>Add Transaction</h2>
 				<form id="transaction-form" novalidate>
 					<label for="item-name">Item Name</label>
-					<input id="item-name" type="text" maxlength="100">
+					<input id="item-name" class="field" type="text" maxlength="100">
 					<p id="item-name-error" class="field-error"></p>
 					<label for="amount">Amount (Rp)</label>
-					<input id="amount" type="number" min="0.01" max="9999999999.99" step="0.01">
+					<input id="amount" class="field" type="number" min="0.01" max="9999999999.99" step="0.01">
 					<p id="amount-error" class="field-error"></p>
 					<label for="category">Category</label>
-					<select id="category"></select>
+					<select id="category" class="field"></select>
 					<p id="category-error" class="field-error"></p>
 					<button type="submit">Add Transaction</button>
 				</form>

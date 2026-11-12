@@ -379,6 +379,7 @@ const renderPieChart = () => {
 const render = () => {
   renderBalance();
   renderTransactionList();
+  renderPieChart();
 }
 
 const getVisibleTransactions = () => {
