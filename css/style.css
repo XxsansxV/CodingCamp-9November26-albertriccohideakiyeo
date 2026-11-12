@@ -283,3 +283,55 @@ header {
   background: transparent;
   color: var(--danger);
 }
+
+.over-limit {
+  background: rgba(220, 38, 38, 0.10);
+}
+
+.transaction-item.over-limit {
+  box-shadow: inset 3px 0 0 var(--danger);
+}
+
+.limit-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.limit-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.limit-row:last-child {
+  border-bottom: 0;
+}
+
+.limit-category {
+  flex: 1 1 80px;
+  min-width: 80px;
+}
+
+.limit-row input {
+  width: 130px;
+  padding: var(--space-1);
+  border: 1px solid var(--border);
+  border-radius: var(--space-1);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+}
+
+.limit-spent {
+  font-size: .8rem;
+  color: var(--text-muted);
+}
+
+.limit-row.over-limit .limit-spent {
+  color: var(--danger);
+  font-weight: 600;
+}

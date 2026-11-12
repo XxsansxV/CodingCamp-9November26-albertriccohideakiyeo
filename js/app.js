@@ -260,6 +260,7 @@ const wireEvents = () => {
   document.querySelector('#sort-select').addEventListener('change', (e) => {
     setSortMethod(e.target.value)
   });
+
   const catBox = document.querySelector('#category-settings');
 
   catBox.addEventListener('submit', (e) => {
@@ -284,6 +285,21 @@ const wireEvents = () => {
       document.querySelector('#settings-error').textContent = err.message;
     }
   })
+
+  const limitBox = document.querySelector('#limit-settings');
+
+  limitBox.addEventListener('change', (e) => {
+    const input = e.target.closest('input[data-limit-category]');
+    if (!input) return;
+    const error = document.querySelector('#settings-error');
+    try {
+      setSpendingLimit(input.dataset.limitCategory, input.value);
+      error.textContent = '';
+    } catch (err) {
+      error.textContent = err.message;
+      renderLimitSettings();
+    }
+  })
 }
 
 const renderTransactionList = () => {
@@ -293,6 +309,7 @@ const renderTransactionList = () => {
   for (const item of getVisibleTransactions()) {
     const li = document.createElement('li');
     li.className = 'transaction-item';
+    if (isOverLimit(item.category)) li.classList.add('over-limit');
 
     const name = document.createElement('span');
     name.className = 'transaction-name';
@@ -428,6 +445,7 @@ const render = () => {
   renderBalance();
   renderTransactionList();
   renderPieChart();
+  renderLimitSettings();
 }
 
 const getVisibleTransactions = () => {
@@ -596,7 +614,7 @@ const renderLimitSettings = () => {
 
   const spent = getSpendingByCategory();
 
-  getAllCategoryNames.forEach((category) => {
+  getAllCategoryNames().forEach((category) => {
     const li = document.createElement('li');
     li.className = 'limit-row';
     if (isOverLimit(category)) li.classList.add('over-limit');
