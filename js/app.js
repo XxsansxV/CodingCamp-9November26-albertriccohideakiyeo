@@ -256,6 +256,9 @@ const wireEvents = () => {
     toggleTheme();
     applyTheme();
   });
+  document.querySelector('#sort-select').addEventListener('change', (e) => {
+    setSortMethod(e.target.value)
+  });
 }
 
 const renderTransactionList = () => {
@@ -403,9 +406,26 @@ const render = () => {
 }
 
 const getVisibleTransactions = () => {
-  return [...state.transactions]
-    .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
-    .slice(0, LIST_LIMIT)
+  return sortTransactions(state.transactions, state.sortMethod).slice(0, LIST_LIMIT);
+}
+
+const setSortMethod = (method) => {
+  state.sortMethod = method;
+  persist();
+  notify();
+}
+
+const sortTransactions = (transactions, method) => {
+  const list = Array.isArray(transactions) ? [...transactions] : [];
+  switch (method){
+    case 'oldest': return list.sort((a,b) => a.timestamp.localeCompare(b.timestamp));
+    case 'newest': return list.sort((a,b) => b.timestamp.localeCompare(a.timestamp));
+    case 'highest': return list.sort((a,b) => b.amount - a.amount);
+    case 'lowest': return list.sort((a,b) => a.amount - b.amount);
+    case 'category-asc': return list.sort((a, b) => a.category.localeCompare(b.category));
+    case 'category-desc': return list.sort((a, b) => b.category.localeCompare(a.category));
+    default: return list.sort((a,b) => b.timestamp.localeCompare(a.timestamp));
+  }
 }
 
 const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : str;
