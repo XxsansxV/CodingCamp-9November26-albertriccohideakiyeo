@@ -207,6 +207,7 @@ const clearFormErrors = () => {
   document.querySelector("#item-name-error").textContent = '';
   document.querySelector("#amount-error").textContent = '';
   document.querySelector("#category-error").textContent = '';
+  document.querySelector("#form-error").textContent = '';
 }
 
 const handleFormSubmit = (e) => {
