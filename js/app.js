@@ -436,10 +436,12 @@ const renderPieChart = () => {
             generateLabels(chart) {
               const data = chart.data.datasets[0].data;
               const total = data.reduce((a, b) => a + b, 0);
+              const textColor = chart.options.plugins.legend.labels.color;
               return chart.data.labels.map((label, i) => ({
                 text: `${label} (${total ? Math.round((data[i] / total) * 100) : 0}%)`,
                 fillStyle: chart.data.datasets[0].backgroundColor[i],
                 strokeStyle: chart.data.datasets[0].backgroundColor[i],
+                fontColor: textColor,
                 index: i,
               }))
             }
