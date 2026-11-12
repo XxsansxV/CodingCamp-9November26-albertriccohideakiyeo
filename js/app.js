@@ -588,7 +588,7 @@ const setSpendingLimit = (category, rawValue) => {
     delete state.spendingLimits[category];
     if (!persist()) {
       state.spendingLimits[category] = previous;
-      throw new Error('Could not save the liit. Storage is unavailable.');
+      throw new Error('Could not save the limit. Storage is unavailable.');
     }
     notify();
     return;
@@ -632,11 +632,12 @@ const renderLimitSettings = () => {
 
     const input = document.createElement('input');
     input.type = 'number';
+    input.name = `limit-${category}`;
     input.min = MIN_LIMIT;
     input.max = MAX_LIMIT;
     input.step = '0.01';
     input.inputMode = 'decimal';
-    input.placeholder = 'No LImit';
+    input.placeholder = 'No Limit';
     input.dataset.limitCategory = category;
     input.setAttribute('aria-label', `Spending limit for ${category}`);
     if (state.spendingLimits[category] !== undefined) {
@@ -652,6 +653,35 @@ const renderLimitSettings = () => {
   })
 
   container.appendChild(list);
+}
+
+const getMonthKey = (date) => {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+const getMonthlySummary = () => {
+  const now = new Date();
+  const currentKey = getMonthKey(now);
+  const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevKey = getMonthKey(prevDate);
+
+  const inMonth = (key) => state.transactions.filter(t => t.timestamp.slice(0, 7) === key);
+  const current = inMonth(currentKey);
+  const previous = inMonth(prevKey);
+
+  const total = current.reduce((sum, t) => sum + t.amount, 0);
+  const prevTotal = previous.reduce((sum, t) => sum + t.amount, 0);
+  const daysInMonth = new Date(now.getFullYear, now.getMonth() + 1, 0).getDate();
+
+  return {
+    monthLabel : now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+    breakdown: calculateCategoryTotals(current),
+    hasPrevious: previous.length > 0,
+    diff: total - prevTotal,
+    percent: prevTotal > 0 ? ((total - prevTotal) / prevTotal) * 100: null,
+    dailyAverage: total / daysInMonth,
+    daysInMonth,
+  };
 }
 
 const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : str;
