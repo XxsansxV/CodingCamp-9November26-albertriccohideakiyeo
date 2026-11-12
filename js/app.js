@@ -68,7 +68,7 @@ const validateLimit = (value) => {
 
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0, style: "currency", currency: 'IDR' }).format(amount);
+  return `Rp${new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(amount)}`;
 }
 
 const formatTimestamp = (date) => {
@@ -81,17 +81,21 @@ const formatTimestamp = (date) => {
 
 const saveToStorage = (key, data) => {
   try {
-    localStorage.setItem(key, data);
+    localStorage.setItem(key, JSON.stringify(data));
     return true;
   } catch (err) {
-    console.log(err);
+    console.error(`failed to save ${key} ${err}`);
     return false;
   }
 }
 
-const loadFromStorage = (key) => {
+const loadFromStorage = (key, fallback = null) => {
   try {    
-    return localStorage.getItem(key);
+    const unprocessed = localStorage.getItem(key);
+    if (unprocessed === null) {
+      return fallback;
+    }
+    return JSON.parse(unprocessed);
   } catch (err) {
     return null;
   }
@@ -99,8 +103,8 @@ const loadFromStorage = (key) => {
 
 const isStorageAvailable = () => {
   try {
-    saveToStorage('test', true);
-    localStorage.removeItem('test');
+    localStorage.setItem('__test__', '1');
+    localStorage.removeItem('__test__');
     return true;
   } catch (err) {
     console.log(err);
@@ -113,5 +117,31 @@ const subscribe = (callback) => {
 }
 
 const notify = () => {
-  //TODO
+  observers.forEach((callback) => callback(state));
 }
+
+const hydrate = () => {
+  const transactions = loadFromStorage(STORAGE_KEYS.transactions, []);
+  const categories = loadFromStorage(STORAGE_KEYS.categories, []);
+  const limits = loadFromStorage(STORAGE_KEYS.limits, {});
+  const settings = loadFromStorage(STORAGE_KEYS.settings, {});
+
+  state.transactions = Array.isArray(transactions) ? transactions : [];
+  state.categories = Array.isArray(categories) ? categories : [];
+  state.spendingLimits =(limits && typeof(limits) === 'object' && !Array.isArray(limits)) ? limits : {};
+  if (settings && typeof(settings) === 'object') {
+    if (settings.theme === 'light' || settings.theme === 'dark') {
+      state.theme = settings.theme;
+    }
+    if (typeof(settings.sortMethod) === 'string') {
+      state.sortMethod = settings.sortMethod;
+    }
+  }
+}
+
+const persist = () => {
+  return saveToStorage(STORAGE_KEYS.transactions, state.transactions) && saveToStorage(STORAGE_KEYS.categories, state.customCategories) && saveToStorage(STORAGE_KEYS.limits, state.spendingLimits) && saveToStorage(STORAGE_KEYS.settings, { theme: state.theme, sortMethod: state.sortMethod, }) ;
+}
+
+// =-=-=-=-=-=-= [ 5 | STATE OPS ] =-=-=-=-=-=-=-=
+// TODO
