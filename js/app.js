@@ -166,7 +166,7 @@ const addTransaction = (itemName, amount, category) => {
 
 const deleteTransaction = (id) => {
   const index = state.transactions.findIndex((item) => item.id === id);
-  if (index !== -1) return false;
+  if (index === -1) return false;
   state.transactions.splice(index, 1);
   persist();
   notify();
@@ -180,3 +180,113 @@ const getTransaction = (id) => {
 const getBalance = () => {
   return state.transactions.reduce((sum, trans) => sum + trans.amount, 0);
 }
+
+// =-=-=-=-=-=-= [ 6 | RENDERER ] =-=-=-=-=-=-=-=
+const renderBalance = () => {
+  document.querySelector('#balance-display').textContent = formatCurrency(getBalance());
+}
+
+const renderCategoryOptions = () => {
+  const categoryCombox = document.querySelector('#category');
+  const current = categoryCombox.value;
+  categoryCombox.replaceChildren();
+  DEFAULT_CATEGORIES.concat(state.customCategories.map(c => c.name)).forEach((name) =>{
+    const optioned = document.createElement('option');
+    optioned.value = name;
+    optioned.textContent = name;
+    categoryCombox.appendChild(optioned);
+  })
+  if (current) categoryCombox.value = current;
+}
+
+const showFieldError = (id, msg) => {
+  document.querySelector(`#${id}`).textContent = msg;
+}
+
+const clearFormErrors = () => {
+  document.querySelector("#item-name-error").textContent = '';
+  document.querySelector("#amount-error").textContent = '';
+  document.querySelector("#category-error").textContent = '';
+}
+
+const handleFormSubmit = (e) => {
+  e.preventDefault();
+  clearFormErrors();
+
+  const itemName = document.querySelector("#item-name").value;
+  const amount = document.querySelector("#amount").value;
+  const category = document.querySelector("#category").value;
+
+  let valid = true
+  if (!validateItemName(itemName)) {
+    showFieldError('item-name-error', `Item name is required (Max ${MAX_ITEM_NAME} characters).`);
+    valid = false;
+  }
+  if (!validateAmount(amount)) {
+    showFieldError('amount-error', `Enter an amount between ${formatCurrency(MIN_AMOUNT)} and ${formatCurrency(MAX_AMOUNT)}.`);
+    valid = false;
+  }
+  if (!category) {
+    showFieldError('category-error', 'Choose a category.');
+    valid = false;
+  }
+  if (!valid) return;
+
+  try {
+    addTransaction(itemName,amount,category);
+    e.target.reset();
+  } catch (err) {
+    document.querySelector("#form-error").textContent = err.message;
+  }
+}
+
+const wireEvents = () => {
+  document.querySelector('#transaction-form').addEventListener('submit', handleFormSubmit);
+  document.querySelector('#transaction-list').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-id]');
+    if (!btn) return;
+    deleteTransaction(btn.dataset.id);
+  })
+}
+
+const render = () => {
+  renderBalance();
+}
+
+const getVisibleTransactions = () => {
+  return [...state.transactions]
+    .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+    .slice(0, LIST_LIMIT)
+}
+
+const truncate = (str, max) => str.length > max ? `${str.slice(0, max-1)}...` : str;
+
+const renderTransactionList = () => {
+  const list = document.querySelector("#transaction-list");
+  list.replaceChildren();
+
+  getVisibleTransactions().map((item) => {
+    const li = document.createElement('li');
+    li.className = 'transaction-item';
+
+    const name = document.createElement('span');
+    name.className = 'transaction-name';
+    name.textContent = truncate(item.itemName, 50);
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'delete-btn';
+    del.dataset.id = item.id;
+    del.setAttribute('aria-label', `Delete ${item.itemName}`);
+  })
+}
+
+const init = () => {
+  hydrate();
+  renderCategoryOptions();
+  subscribe(render);
+  wireEvents();
+  render();
+}
+
+document.addEventListener('DOMContentLoaded', init());
