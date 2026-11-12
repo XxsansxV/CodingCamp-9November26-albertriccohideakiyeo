@@ -63,7 +63,7 @@ const validateCategoryName = (value) => {
 }
 
 const validateLimit = (value) => {
-  return isFinite(value) && value >= MIN_LIMIT && value <= MAX_LIMIT && value !== 0;
+  return isFinite(Number(value) && Number(value) >= MIN_LIMIT && Number(value) <= MAX_LIMIT && Number(value) !== 0);
 }
 
 
@@ -147,7 +147,7 @@ const persist = () => {
 
 const addTransaction = (itemName, amount, category) => {  
   if (!validateItemName(itemName)) throw new Error('Item name is required! (Max 100 characters)');
-  if (!validateAmount(amount)) throw new Error(`Amount must be between ${MIN_AMOUNT} and ${MAX_AMOUNT}!`);
+  if (!validateAmount(amount)) throw new Error(`Amount must be between ${formatCurrency(MIN_AMOUNT)} and ${formatCurrency(MAX_AMOUNT)}!`);
   if (typeof(category)!=='string' || category.trim()==='') throw new Error('Category is required.');
   if (state.transactions.length >= MAX_TRANSACTIONS) throw new Error(`You tried adding another transaction, but max is ${MAX_TRANSACTIONS}`);
 
