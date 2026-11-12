@@ -134,6 +134,16 @@ header {
   margin-top: 2px;
 }
 
+.storage-error {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: var(--space-1);
+  padding: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-size: .85rem;
+}
+
 .error-message:empty,
 .field-error:empty {
   display: none;
