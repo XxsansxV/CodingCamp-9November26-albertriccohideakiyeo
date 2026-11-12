@@ -259,6 +259,30 @@ const wireEvents = () => {
   document.querySelector('#sort-select').addEventListener('change', (e) => {
     setSortMethod(e.target.value)
   });
+  const catBox = document.querySelector('#category-settings');
+
+  catBox.addEventListener('submit', (e) => {
+    if (!e.target.matches('#category-form')) return;
+    e.preventDefault();
+    const input = e.target.querySelector('#new-category');
+    const error = document.querySelector('#settings-error');
+    try {
+      addCategory(input.value);
+      error.textContent = '';
+    } catch (err) {
+      error.textContent = err.message;
+    }
+  })
+  catBox.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-remove-id]');
+    if (!btn) return;
+    document.querySelector('#settings-error').textContent = '';
+    try {
+      removeCategory(btn.dataset.removeId);
+    } catch (err) {
+      document.querySelector('#settings-error').textContent = err.message;
+    }
+  })
 }
 
 const renderTransactionList = () => {
@@ -426,6 +450,105 @@ const sortTransactions = (transactions, method) => {
     case 'category-desc': return list.sort((a, b) => b.category.localeCompare(a.category));
     default: return list.sort((a,b) => b.timestamp.localeCompare(a.timestamp));
   }
+}
+
+const getAllCategoryNames = () => {
+  return [...DEFAULT_CATEGORIES,...state.customCategories.map(c => c.name)];
+}
+
+const renderCategorySettings = () => {
+  const container = document.querySelector("#category-settings");
+  container.replaceChildren();
+
+  const form = document.createElement('form');
+  form.id = 'category-form';
+  form.id = 'category-add';
+  const input = document.createElement('input');
+  input.id = 'new-category';
+  input.type = 'text';
+  input.maxLength = MAX_CATEGORY_NAME;
+  input.placeholder = 'New category';
+  input.autocomplete = 'off';
+  input.setAttribute('aria-label', 'New category name');
+
+  const addButton = document.createElement('button');
+  addButton.type = 'submit';
+  addButton.textContent = 'Add';
+  addButton.disabled = state.customCategories.length >= MAX_CUSTOM_CATEGORIES;
+
+  form.append(input, addButton);
+
+
+  const count = document.createElement('p');
+  count.className = 'category-count';
+  count.textContent = `Custom categories (${state.customCategories.length}/${MAX_CUSTOM_CATEGORIES})`;
+
+  const list = document.createElement('ul');
+  list.className = 'category-list';
+
+  if (state.customCategories.length === 0) {
+    const empty = document.createElement('li');
+    empty.className = 'category-list-empty';
+    empty.textContent = 'No custom categories yet.';
+    list.appendChild(empty);
+  }
+
+  state.customCategories.forEach((category) => {
+    const li = document.createElement('li');
+
+    const name = document.createElement('span');
+    name.textContent = category.name;
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'remove-category-btn';
+    remove.dataset.removeId = category.id;
+    remove.setAttribute('aria-label', `Remove ${category.name}`);
+    remove.textContent = '×';
+
+    li.append(name, remove);
+    list.appendChild(li);
+  })
+
+  container.append(count,form,list);
+} 
+
+const addCategory = (name) => {
+  const trimmed = name.trim();
+  if (!validateCategoryName(trimmed)) throw new Error(`Category name must be 1-${MAX_CATEGORY_NAME}`);
+  if (state.customCategories.length >= MAX_CUSTOM_CATEGORIES) throw new Error(`Maximum ${MAX_CUSTOM_CATEGORIES} categories reached`);
+  if (getAllCategoryNames().some(c => c.toLowerCase() === trimmed.toLowerCase())) throw new Error('That category alreaedy exists');
+
+  state.customCategories.push({ id: generateId(), name: trimmed, isDefault: false});
+  if (!persist()) {
+    state.customCategories.pop();
+    throw new Error('Could not save the category. Storage is unavailable.');
+  }
+  renderCategoryOptions();
+  renderCategorySettings();
+  notify();
+}
+
+const removeCategory = (id) => {
+  const before = state.customCategories;
+  const next = before.filter(c => c.id !== id);
+  if (next.length === before.length) return false;
+
+  state.customCategories = next;
+  if (!persist()) {
+    state.customCategories = before;
+    throw new Error('Could not remove category. Storage is unavailable.');
+  }
+
+  renderCategoryOptions();
+  renderCategorySettings();
+  notify();
+  return true;
+
+  renderCategoryOptions();
+  renderCategorySettings();
+  notify();
+  return true;
 }
 
 const truncate = (str, max) => str.length > max ? `${str.slice(0, max-3)}...` : str;
